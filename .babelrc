@@ -1,0 +1,11 @@
+{
+  "presets": [
+    ["env", {
+      "modules": false,
+      "targets": { "uglify": true }
+    }]
+  ],
+  "plugins": [
+    "external-helpers"
+  ]
+}

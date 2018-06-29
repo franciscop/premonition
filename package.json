@@ -1,0 +1,35 @@
+{
+  "name": "premonition",
+  "version": "0.1.0",
+  "description": "Convert your website to a Progressive Web App with a single link. Or just make it faster, it's up to you. Include the script in your website to see it work:",
+  "main": "index.min.js",
+  "scripts": {
+    "build": "rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "rollup -c --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/franciscop/premonition.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/franciscop/premonition/issues"
+  },
+  "homepage": "https://github.com/franciscop/premonition#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.7.0",
+    "builtin-modules": "^3.0.0",
+    "rollup": "^0.62.0",
+    "rollup-plugin-babel": "^3.0.5",
+    "rollup-plugin-babel-minify": "^5.0.0",
+    "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-uglify": "^4.0.0",
+    "tiny-lru": "^1.6.1"
+  }
+}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://francisco.io/style.min.css">
+  <link rel="stylesheet" href="/demo/style.min.css">
+</head>
+<body>
+  <article>
+    <a href="/demo/">All Articles</a>
+    {{{body}}}
+    {{> readnext}}
+  </article>
+  <script src="/index.min.js" data-once></script>
+  <script type="text/javascript">
+    console.log('NO PARSING NEEDED');
+  </script>
+</body>
+</html>
