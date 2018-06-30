@@ -25,7 +25,7 @@ You now have this API available:
 
 ```js
 // Parse the full current website from scratch
-pre.init(MODE);   // Note: it is called onload
+pre.init(OPTS);   // Note: it is called onload
 
 // Open the passed urls or link element
 pre.open(URL);
@@ -81,7 +81,7 @@ Examples:
 
 
 
-### Mode `data-pre-mode`
+### `mode`
 
 There are several modes that you can tweak within the `<body>` tag:
 
@@ -117,24 +117,78 @@ Finally, turn it off if you want to manually and selectively load links in some 
 
 
 
-### Load Once
+### `once`
 
-Evaluate the script only once even if it's available in the new page:
+Evaluate a `<script>` only once ever even if it's in the new page:
 
 ```html
 <script src="..." data-pre-once></script>
 ```
 
-This *does not work with inline scripts* since there's no way to identify those otherwise. If you want to ignore a script from one page in another page, you can set `data-pre-ignore` for anything:
+If the script src target does not exist in the old page but exists in the new page, it will be run. If it already exists in the old page, it will be skipped.
+
+**Add this option** for these kind of libraries since they *only define a global API* so we only want them to run once:
+- jQuery.js
+- moment.js
+- etc.
+
+**Do not add** to scripts that run some code against the current HTML since those will very likely need to run it with the new HTML:
+- Inline scripts (will be ignored). To avoid re-rendering inline scripts, see [the option ignore](#ignore).
+- prism.js: this will automatically highlight the page code snippets, so it needs to be run on every pageload.
+- etc.
+
+Compare the options for loading a script from the new page:
+
+- `<script src="..."></script>`: run the full script after the HTML has loaded.
+- `<script src="..." data-pre-once></script>`: run the script only if the `src` is not in the previous page(s).
+- `<script src="..." data-pre-ignore></script>`: completely ignore the script. Will not be run at all in any case.
+
+
+
+### `ignore`
+
+Premonition will completely ignore a script, link, etc. with this option:
 
 ```html
+<a href="/logout" data-pre-ignore></script>
 <script src="..." data-pre-ignore></script>
 ```
 
+This is useful for some links that you do not want preloaded or scripts that you do not want re-evaluated. Examples:
 
+- Inline scripts that must be run only onload. We cannot prevent those from running on a full page refresh, but we can avoid re-running those.
+- Links that are making a request that changes some state. We would recommend in this situation to follow the `HTTP` specification, so links only do GET requests which have no side effects. Leave side effects for `<form>`.
+
+Compare the options for loading a script from the new page:
+
+- `<script src="..."></script>`: run the full script after the HTML has loaded.
+- `<script src="..." data-pre-once></script>`: run the script only if the `src` is not in the previous page(s).
+- `<script src="..." data-pre-ignore></script>`: completely ignore the script. Will not be run at all in any case.
 
 
 
 ## Troubleshooting
 
-**Very early experiment**, [contact me](https://francisco.io/) if you need any help.
+**Very early experiment**, [please open an issue](https://github.com/franciscop/premonition) if you need any help.
+
+
+
+## FAQ, credit and alternatives
+
+### What about [Instant Click](http://instantclick.io/)?
+
+I love it! It was the main inspiration for Premonition.js. However, it is ridden with bugs and [development seems to be stopped](https://github.com/dieulot/instantclick/) with [pull requests languishing](https://github.com/dieulot/instantclick/pulls). These bugs/lack of features were show-stoppers for me:
+
+- No cache. This means that if you move your mouse around, the links will be fetched again and again.
+- Important [race conditions](https://github.com/dieulot/instantclick/pull/85): you never know which script will finish first, which will definitely lead to bugs. I fixed this by loading the scripts sequentially.
+- Plug-n-play: I would like to just drop the script into some of my projects, so I worked very hard to make this work by default. Instantclick seems to be more oriented to using the API.
+
+
+### What about [Turbolinks](https://github.com/turbolinks/turbolinks)?
+
+Another very awesome project. However, its scope seems to be a lot smaller. The similar feature with Premonition is `mode: spa`. Use Turbolinks if you want a very well tested and documented library, use Premonition if you want faster pages.
+
+
+### Why do you use [Tiny-LRU](https://github.com/avoidwork/tiny-lru)?
+
+Because it is awesome! The LRU algorithm ensures that only the most recent URLs are cached, improving the memory usage and reducing the cache misses.

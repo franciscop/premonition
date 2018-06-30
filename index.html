@@ -31,7 +31,7 @@
 <h2 id="api">API</h2>
 <p>You now have this API available:</p>
 <pre><code class="language-js">// Parse the full current website from scratch
-pre.init(MODE);   // Note: it is called onload
+pre.init(OPTS);   // Note: it is called onload
 
 // Open the passed urls or link element
 pre.open(URL);
@@ -75,7 +75,7 @@ pre.on(&#39;cache.remove&#39;, e =&gt; {});  // Some HTML is removed from the ca
 &lt;body data-pre=&quot;pwa&quot; data-pre-expire=&quot;100s&quot;&gt;
 &lt;body data-pre=&quot;pwa&quot; data-pre-expire=&quot;100s&quot; data-pre-elements=&quot;100&quot;&gt;
 &lt;body data-pre=&quot;preload&quot;&gt;</code></pre>
-<h3 id="mode-data-pre-mode">Mode <code>data-pre-mode</code></h3>
+<h3 id="mode"><code>mode</code></h3>
 <p>There are several modes that you can tweak within the <code>&lt;body&gt;</code> tag:</p>
 <pre><code class="language-html">&lt;body data-pre=&quot;pwa&quot;&gt;...&lt;/body&gt;
 &lt;body data-pre=&quot;preload&quot;&gt;...&lt;/body&gt;
@@ -98,11 +98,43 @@ pre.on(&#39;cache.remove&#39;, e =&gt; {});  // Some HTML is removed from the ca
 <p>If you are in the middle-ground, then <code>preload</code> is nice in that it will boost greatly page load speed while only preloading selectively those links that are hovered.</p>
 <p>If you want a very light experience without any wasted requests for the user but still slightly faster loads, then use the <code>spa</code> mode. It has slightly better performance in mobile (300ms).</p>
 <p>Finally, turn it off if you want to manually and selectively load links in some situations. Use this to load links only when they become visible on scrolling for example.</p>
-<h3 id="load-once">Load Once</h3>
-<p>Evaluate the script only once even if it&#39;s available in the new page:</p>
+<h3 id="once"><code>once</code></h3>
+<p>Evaluate a <code>&lt;script&gt;</code> only once ever even if it&#39;s in the new page:</p>
 <pre><code class="language-html">&lt;script src=&quot;...&quot; data-pre-once&gt;&lt;/script&gt;</code></pre>
-<p>This <em>does not work with inline scripts</em> since there&#39;s no way to identify those otherwise. If you want to ignore a script from one page in another page, you can set <code>data-pre-ignore</code> for anything:</p>
-<pre><code class="language-html">&lt;script src=&quot;...&quot; data-pre-ignore&gt;&lt;/script&gt;</code></pre>
+<p>If the script src target does not exist in the old page but exists in the new page, it will be run. If it already exists in the old page, it will be skipped.</p>
+<p><strong>Add this option</strong> for these kind of libraries since they <em>only define a global API</em> so we only want them to run once:</p>
+<ul>
+<li>jQuery.js</li>
+<li>moment.js</li>
+<li>etc.</li>
+</ul>
+<p><strong>Do not add</strong> to scripts that run some code against the current HTML since those will very likely need to run it with the new HTML:</p>
+<ul>
+<li>Inline scripts (will be ignored). To avoid re-rendering inline scripts, see <a href="#ignore">the option ignore</a>.</li>
+<li>prism.js: this will automatically highlight the page code snippets, so it needs to be run on every pageload.</li>
+<li>etc.</li>
+</ul>
+<p>Compare the options for loading a script from the new page:</p>
+<ul>
+<li><code>&lt;script src=&quot;...&quot;&gt;&lt;/script&gt;</code>: run the full script after the HTML has loaded.</li>
+<li><code>&lt;script src=&quot;...&quot; data-pre-once&gt;&lt;/script&gt;</code>: run the script only if the <code>src</code> is not in the previous page(s).</li>
+<li><code>&lt;script src=&quot;...&quot; data-pre-ignore&gt;&lt;/script&gt;</code>: completely ignore the script. Will not be run at all in any case.</li>
+</ul>
+<h3 id="ignore"><code>ignore</code></h3>
+<p>Premonition will completely ignore a script, link, etc. with this option:</p>
+<pre><code class="language-html">&lt;a href=&quot;/logout&quot; data-pre-ignore&gt;&lt;/script&gt;
+&lt;script src=&quot;...&quot; data-pre-ignore&gt;&lt;/script&gt;</code></pre>
+<p>This is useful for some links that you do not want preloaded or scripts that you do not want re-evaluated. Examples:</p>
+<ul>
+<li>Inline scripts that must be run only onload. We cannot prevent those from running on a full page refresh, but we can avoid re-running those.</li>
+<li>Links that are making a request that changes some state. We would recommend in this situation to follow the <code>HTTP</code> specification, so links only do GET requests which have no side effects. Leave side effects for <code>&lt;form&gt;</code>.</li>
+</ul>
+<p>Compare the options for loading a script from the new page:</p>
+<ul>
+<li><code>&lt;script src=&quot;...&quot;&gt;&lt;/script&gt;</code>: run the full script after the HTML has loaded.</li>
+<li><code>&lt;script src=&quot;...&quot; data-pre-once&gt;&lt;/script&gt;</code>: run the script only if the <code>src</code> is not in the previous page(s).</li>
+<li><code>&lt;script src=&quot;...&quot; data-pre-ignore&gt;&lt;/script&gt;</code>: completely ignore the script. Will not be run at all in any case.</li>
+</ul>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <p><strong>Very early experiment</strong>, <a href="https://francisco.io/">contact me</a> if you need any help.</p>
 
