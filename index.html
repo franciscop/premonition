@@ -20,35 +20,26 @@
   <article>
     <h1 id="preload-app">Preload App</h1>
 <blockquote>
-<p><strong>Early experiment</strong>: only basic automatic parsing and the API specified are available now.</p>
+<p><strong>Early experiment</strong>, use at your own [high] risk.</p>
 </blockquote>
-<p>Convert your website to a Progressive Web App with a single link. Or just make it faster, it&#39;s up to you. Include the script in your website to see it work:</p>
+<p>Make your website load <em>very</em> fast. Converts your website to a Single Page Application. Or just make it faster, it&#39;s up to you. Include the script in your website to see it work:</p>
 <pre><code class="language-html">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/premonition&quot; data-pre-once&gt;&lt;/script&gt;</code></pre>
-<p>There are several modes, useful depending on your type of website and desired performance boost:</p>
-<ul>
-<li>PWA (Progressive Web App): will load and cache all the internal pages linked from the current page for 24h. Needs a <code>manifest.json</code> to actually become a PWA.</li>
-<li>Preload: will fetch the link when hovering a link for significantly faster loading. Cache the pages for 1h.</li>
-<li>SPA6: load the new page in-body without triggering a full reload. Make the page seem slightly faster. Cache the pages for 1 minute.</li>
-<li>Off: will not try to load or cache anything. You can now call the different methods to hook up.</li>
-</ul>
-<p>To trigger a mode, just write the attribute <code>data-mode</code> inside the <code>&lt;body&gt;</code>:</p>
-<pre><code class="language-html">&lt;body data-pre=&quot;pwa&quot;&gt;...&lt;/body&gt;
-&lt;body data-pre=&quot;preload&quot;&gt;...&lt;/body&gt;
-&lt;body data-pre=&quot;spa&quot;&gt;...&lt;/body&gt;
-&lt;body data-pre=&quot;off&quot;&gt;...&lt;/body&gt;</code></pre>
-<p><strong>Default</strong>: there is no default! In normal web usage it will use <code>preload</code>, but if it detects it&#39;s installed in a device as a PWA it will trigger <code>pwa</code>. If you want tight control specify the mode manually as shown above.</p>
-<p>Note: the cache is only in-memory; any page reload or the PWA getting closed will clear it.</p>
+<p>That&#39;s it, your website should be <em>very</em> fast now. You can use the <a href="#api">Javascript API</a> or configure it <a href="#options">with the options</a>. See <a href="#troubleshooting">the troubleshooting guide</a> if you have any issue.</p>
+<blockquote>
+<p><strong>Experiment tip</strong>: open <a href="https://cdn.jsdelivr.net/npm/premonition">the CDN link</a>, copy the JS and paste it into your website console for testing this project in a real env in ~10s. If there&#39;s any error you&#39;ll have to do this again.</p>
+</blockquote>
 <h2 id="api">API</h2>
-<pre><code class="language-js">// Automatically launch the full parser. Useful if you modify links dynamically
-pre.init();
+<p>You now have this API available:</p>
+<pre><code class="language-js">// Parse the full current website from scratch
+pre.init(MODE);   // Note: it is called onload
 
-// Open one of the urls. Fallback if it&#39;s an external path
+// Open the passed urls or link element
 pre.open(URL);
 
-// [pre]load a link into memory so a click later will be very fast cached
+// [pre]load a link into memory for later opening
 pre.load(URL);
 
-// Replace the current, full html by a new url+html content
+// Replace the current page by a new url+html
 pre.replace(&#39;/hello&#39;, &#39;&lt;html&gt;...&lt;/html&gt;&#39;);
 
 // Cache instance. Using tiny-lru: https://www.npmjs.com/package/tiny-lru
@@ -65,22 +56,55 @@ pre.on(&#39;ready&#39;, e =&gt; {});         // The DOM is ready to be used
 pre.on(&#39;init&#39;, e =&gt; {});          // The script initialization is called
 pre.on(&#39;load&#39;, e =&gt; {});          // A single URL is attempted to be preloaded
 pre.on(&#39;preload&#39;, e =&gt; {});       // Alias for &#39;load&#39;
-pre.on(&#39;open&#39;, e =&gt; {});          // An HREF is going to be open (load+replace?)
+pre.on(&#39;open&#39;, e =&gt; {});          // An HREF is going to be open (load+replace)
 pre.on(&#39;replace&#39;, e =&gt; {});       // The website content is going to be updated
 pre.on(&#39;fetch&#39;, e =&gt; {});         // A HREF is going to be fetched
 pre.on(&#39;error&#39;, e =&gt; {});         // There is an error somewhere
 pre.on(&#39;cache.get&#39;, e =&gt; {});     // When a link is read from cache
 pre.on(&#39;cache.set&#39;, e =&gt; {});     // Update the cache with more HREF+HTML
 pre.on(&#39;cache.remove&#39;, e =&gt; {});  // Some HTML is removed from the cache</code></pre>
-<h2 id="planned-features-and-fixes">Planned features and fixes</h2>
-<p>These are the planned features:</p>
-<p>-</p>
+<h2 id="options">Options</h2>
+<p>There are global options and per-element options:</p>
 <ul>
-<li>Events. All of the <code>pre.on()</code> do not work now, make them work with links.</li>
-<li>Hashes seem to be working, but now have to make sure they do work.</li>
-<li>Modes. These would default different configuration.</li>
-<li>Offline cache. Works like cache, but offline. Has a longer cache time so that when a page goes offline (NetworkError) it is retrieved from cache, making it into a SPA.</li>
+<li>Global options can be specified on the <code>&lt;body&gt;</code> element or when calling <code>pre.init({ OPTIONS })</code>.</li>
+<li>Element options should be specified in the element (e.g., <code>&lt;script&gt;</code>) or when calling the specific method.</li>
 </ul>
+<p>When using HTML elements, they are always prefixed by <code>data-pre-NAME=&quot;&quot;</code> (except <code>data-pre=&quot;&quot;</code>, which is the mode).</p>
+<p>Examples:</p>
+<pre><code class="language-html">&lt;body data-pre=&quot;pwa&quot;&gt;
+&lt;body data-pre=&quot;pwa&quot; data-pre-expire=&quot;100s&quot;&gt;
+&lt;body data-pre=&quot;pwa&quot; data-pre-expire=&quot;100s&quot; data-pre-elements=&quot;100&quot;&gt;
+&lt;body data-pre=&quot;preload&quot;&gt;</code></pre>
+<h3 id="mode-data-pre-mode">Mode <code>data-pre-mode</code></h3>
+<p>There are several modes that you can tweak within the <code>&lt;body&gt;</code> tag:</p>
+<pre><code class="language-html">&lt;body data-pre=&quot;pwa&quot;&gt;...&lt;/body&gt;
+&lt;body data-pre=&quot;preload&quot;&gt;...&lt;/body&gt;
+&lt;body data-pre=&quot;spa&quot;&gt;...&lt;/body&gt;
+&lt;body data-pre=&quot;off&quot;&gt;...&lt;/body&gt;</code></pre>
+<p>These are useful depending on your type of website and desired performance boost:</p>
+<ul>
+<li><code>pwa</code> (Progressive Web App): the most aggressive one, will load and cache all the internal pages linked from the current page for 24h. Note: still needs a <code>manifest.json</code> to actually become a PWA.</li>
+<li><code>preload</code>: will fetch the link when hovering a link for significantly faster loading. Cache the pages for 100 seconds.</li>
+<li><code>spa</code> (Single Page Application): will fetch the page onmousedown and load the new page in-body. Make the page seem slightly faster. Cache the pages for 10 seconds.</li>
+<li><code>off</code>: will not try to load or cache anything. You can now call the different methods to hook up specific link in specific situations.</li>
+</ul>
+<p><strong>Default mode</strong>: In normal web usage it will use <code>preload</code>, but if it detects it&#39;s installed in a device as a PWA it will trigger the <code>pwa</code> mode. If you want tight control specify the mode manually as shown above.</p>
+<blockquote>
+<p>The cache is only in-memory; any page reload or the PWA getting closed will clear it.</p>
+</blockquote>
+<h4 id="picking-a-mode">Picking a mode</h4>
+<p>The mode will determine how aggressively the preload and cache is used and your users data consumption. Until you get used to the details, just don&#39;t pick a mode and let premonition.js choose for you.</p>
+<p>Premonition <em>only</em> loads the html and scripts (see <a href="#load-once">skipping scripts</a>). These normally are quite light and ~10-20 average HTML pages are the equivalent of a single image. So, if your site is fairly small, <code>pwa</code> is the recommended way to go.</p>
+<p>If you are in the middle-ground, then <code>preload</code> is nice in that it will boost greatly page load speed while only preloading selectively those links that are hovered.</p>
+<p>If you want a very light experience without any wasted requests for the user but still slightly faster loads, then use the <code>spa</code> mode. It has slightly better performance in mobile (300ms).</p>
+<p>Finally, turn it off if you want to manually and selectively load links in some situations. Use this to load links only when they become visible on scrolling for example.</p>
+<h3 id="load-once">Load Once</h3>
+<p>Evaluate the script only once even if it&#39;s available in the new page:</p>
+<pre><code class="language-html">&lt;script src=&quot;...&quot; data-pre-once&gt;&lt;/script&gt;</code></pre>
+<p>This <em>does not work with inline scripts</em> since there&#39;s no way to identify those otherwise. If you want to ignore a script from one page in another page, you can set <code>data-pre-ignore</code> for anything:</p>
+<pre><code class="language-html">&lt;script src=&quot;...&quot; data-pre-ignore&gt;&lt;/script&gt;</code></pre>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p><strong>Very early experiment</strong>, <a href="https://francisco.io/">contact me</a> if you need any help.</p>
 
   </article>
 

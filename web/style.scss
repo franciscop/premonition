@@ -30,9 +30,23 @@ article {
     padding: 0;
   }
 
+  h2, h3 {
+    padding: 1.5em 0 0;
+  }
 
-  a {
-    display: block;
+  p {
+    margin: .6em 0;
+  }
+
+
+  .flex {
+    a {
+      display: block;
+    }
+    h2, h3 {
+      margin: 0;
+      padding: 0;
+    }
   }
 
   [data-pre-cached]::after {
@@ -41,11 +55,10 @@ article {
     font-size: 0.6em;
     margin-left: 5px;
     margin-top: 3px;
-    background: #ddd;
+    background: #f12711aa;
     border-radius: 3px;
     padding: 2px 5px;
     vertical-align: middle;
-    background: red;
     color: #fff;
   }
 }

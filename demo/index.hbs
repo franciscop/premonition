@@ -13,7 +13,7 @@
     <a class="brand" href="/">premonition.js</a>
     <div class="menu">
       <a href="/demo">Demo</a>
-      <a href="">World</a>
+      <a href="https://github.com/franciscop/premonition">Github</a>
     </div>
   </nav>
 
@@ -22,12 +22,14 @@
     <p>Click around the different links. We are rendering a "cached!" tag when an element is cached, and removing it when the cache has expired.</p>
     <div class="flex two">
       {{#each blog}}
-        <div>
-          <a href="/demo/{{this.id}}/">
-            <h2 id="{{this.id}}">{{this.title}}</h2>
-            <time datetime="{{this.date}}">{{this.date}}</time>
-          </a>
-        </div>
+        {{#if this.date}}
+          <div>
+            <a href="/demo/{{this.id}}/">
+              <h2 id="{{this.id}}">{{this.title}}</h2>
+              <time datetime="{{this.date}}">{{this.date}}</time>
+            </a>
+          </div>
+        {{/if}}
       {{/each}}
     </div>
     <div>
