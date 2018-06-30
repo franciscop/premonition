@@ -10,6 +10,8 @@ export default function (href, html, { history = true } = {}) {
     window.history.pushState({ href }, "", href);
   }
 
+  window.scrollTo(0, 0);
+
   // Generate a "virtual dom" (no, not your React virtual dom)
   const dom = document.createElement("html");
   dom.innerHTML = html;

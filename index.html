@@ -13,7 +13,7 @@
     <a class="brand" href="/">premonition.js</a>
     <div class="menu">
       <a href="/demo">Demo</a>
-      <a href="">World</a>
+      <a href="https://github.com/franciscop/premonition">Github</a>
     </div>
   </nav>
 
@@ -32,10 +32,10 @@
 <li>Off: will not try to load or cache anything. You can now call the different methods to hook up.</li>
 </ul>
 <p>To trigger a mode, just write the attribute <code>data-mode</code> inside the <code>&lt;body&gt;</code>:</p>
-<pre><code class="language-html">&lt;body data-mode=&quot;pwa&quot;&gt;...&lt;/body&gt;
-&lt;body data-mode=&quot;preload&quot;&gt;...&lt;/body&gt;
-&lt;body data-mode=&quot;spa&quot;&gt;...&lt;/body&gt;
-&lt;body data-mode=&quot;off&quot;&gt;...&lt;/body&gt;</code></pre>
+<pre><code class="language-html">&lt;body data-pre=&quot;pwa&quot;&gt;...&lt;/body&gt;
+&lt;body data-pre=&quot;preload&quot;&gt;...&lt;/body&gt;
+&lt;body data-pre=&quot;spa&quot;&gt;...&lt;/body&gt;
+&lt;body data-pre=&quot;off&quot;&gt;...&lt;/body&gt;</code></pre>
 <p><strong>Default</strong>: there is no default! In normal web usage it will use <code>preload</code>, but if it detects it&#39;s installed in a device as a PWA it will trigger <code>pwa</code>. If you want tight control specify the mode manually as shown above.</p>
 <p>Note: the cache is only in-memory; any page reload or the PWA getting closed will clear it.</p>
 <h2 id="api">API</h2>
@@ -72,6 +72,15 @@ pre.on(&#39;error&#39;, e =&gt; {});         // There is an error somewhere
 pre.on(&#39;cache.get&#39;, e =&gt; {});     // When a link is read from cache
 pre.on(&#39;cache.set&#39;, e =&gt; {});     // Update the cache with more HREF+HTML
 pre.on(&#39;cache.remove&#39;, e =&gt; {});  // Some HTML is removed from the cache</code></pre>
+<h2 id="planned-features-and-fixes">Planned features and fixes</h2>
+<p>These are the planned features:</p>
+<p>-</p>
+<ul>
+<li>Events. All of the <code>pre.on()</code> do not work now, make them work with links.</li>
+<li>Hashes seem to be working, but now have to make sure they do work.</li>
+<li>Modes. These would default different configuration.</li>
+<li>Offline cache. Works like cache, but offline. Has a longer cache time so that when a page goes offline (NetworkError) it is retrieved from cache, making it into a SPA.</li>
+</ul>
 
   </article>
 

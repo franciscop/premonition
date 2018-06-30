@@ -1,4 +1,5 @@
 ---
+title: premonition.js
 layout: home.hbs
 ---
 
@@ -22,10 +23,10 @@ There are several modes, useful depending on your type of website and desired pe
 To trigger a mode, just write the attribute `data-mode` inside the `<body>`:
 
 ```html
-<body data-mode="pwa">...</body>
-<body data-mode="preload">...</body>
-<body data-mode="spa">...</body>
-<body data-mode="off">...</body>
+<body data-pre="pwa">...</body>
+<body data-pre="preload">...</body>
+<body data-pre="spa">...</body>
+<body data-pre="off">...</body>
 ```
 
 **Default**: there is no default! In normal web usage it will use `preload`, but if it detects it's installed in a device as a PWA it will trigger `pwa`. If you want tight control specify the mode manually as shown above.
@@ -71,3 +72,14 @@ pre.on('cache.get', e => {});     // When a link is read from cache
 pre.on('cache.set', e => {});     // Update the cache with more HREF+HTML
 pre.on('cache.remove', e => {});  // Some HTML is removed from the cache
 ```
+
+
+## Planned features and fixes
+
+These are the planned features:
+
+-
+- Events. All of the `pre.on()` do not work now, make them work with links.
+- Hashes seem to be working, but now have to make sure they do work.
+- Modes. These would default different configuration.
+- Offline cache. Works like cache, but offline. Has a longer cache time so that when a page goes offline (NetworkError) it is retrieved from cache, making it into a SPA.
