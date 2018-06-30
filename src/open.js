@@ -6,8 +6,8 @@ export default async function (ref) {
   // TODO: make sure that the url is not the current one with a fragment
 
   try {
-    // .preload() already does all the cache and loading checking
-    const data = await this.preload(href);
+    // .load() already does all the cache and loading checking
+    const data = await this.load(href);
 
     // Merge the data from the new site with the current one
     await this.merge(data);
@@ -15,7 +15,7 @@ export default async function (ref) {
     return this.init();
   } catch (error) {
     // Manually load the new page
-    console.log('ERROR:', error);
+    this.report(error);
     location.href = href;
   }
 };

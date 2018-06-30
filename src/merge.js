@@ -1,5 +1,5 @@
+import $ from './fquery';
 import inject from './inject';
-
 
 // Set the new content to whatever it is passed
 export default function ({ href, html }) {
@@ -13,17 +13,12 @@ export default function ({ href, html }) {
   dom.innerHTML = html;
 
   // Body replacement
-  const body = document.querySelector('body')
+  const body = document.body;
   body.innerHTML = '';
-  [...dom.querySelector('body').children].forEach(node => {
-    body.appendChild(node);
-  });
+  [...$('body', dom)[0].childNodes].forEach(node => body.appendChild(node));
 
   // Head replacement
   this.head(document.head, dom.querySelector('head'));
-
-  // Load scripts
-  const scripts = [...document.querySelectorAll('script')];
 
   // Recursive iteration over the scripts when they have finished loading
   const flipScript = ([current, ...scripts]) => {
@@ -31,6 +26,6 @@ export default function ({ href, html }) {
     return inject(current, body, this.loaded).then(() => flipScript(scripts));
   }
 
-  // Reattach the links
-  return flipScript(scripts);
+  // Inject each of the scripts sequentially
+  return flipScript($('script'));
 };

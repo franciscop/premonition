@@ -3,22 +3,23 @@
 import lru from 'tiny-lru';
 
 import init from './init';
-import preload from './preload';
+import load from './load';
 import open from './open';
 import links from './links';
 import head from './head';
 import merge from './merge';
 
-const pageLoad = new Promise((resolve) => {
+const Premonition = function ({ attrs } = {}) {
 
-  // without jQuery (doesn't work in older IEs)
-  document.addEventListener('DOMContentLoaded', resolve, false);
-});
+  // Make sure we are working with the instance even for const a = Premonition()
+  if (!(this instanceof Premonition)) return new Premonition({ attrs });
 
-const Premonition = function () {
-  if (!(this instanceof Premonition)) {
-    return new Premonition();
-  }
+  // The names of the attributes
+  this.attrs = Object.assign({
+    once: 'data-pre-once',
+    keep: 'data-pre-keep',
+    cache: 'data-pre-cached'
+  }, attrs);
 
   // Loader is the one for the current in-progress request Promises
   this.loader = {};
@@ -27,42 +28,24 @@ const Premonition = function () {
   this.loaded = {};
 
   // Then they go to the cache. This only stores serializable data.
-  this.cache = lru();
+  // Args: max (items), notify (of changes), ttl, expire (10 seconds)
+  this.cache = lru(100, true, 0, 10000);
 
-  // Cache for 100 seconds (or browser refresh)
-  this.cache.expire = 10000;
-
-  this.cache.notify = true;
-  this.cache.onchange = event => {
-    if (event !== 'remove' && event !== 'set') return;
-    this.links();
-  };
-
-  // The names of the attributes
-  this.attrs = {
-    keep: 'data-pre-keep',
-    cache: 'data-pre-cached'
-  };
+  this.cache.onchange = event => this.links();
 
   window.onpopstate = e => load(e.currentTarget.location.href);
 
-  this.preload = preload;
+  this.init = init;
+  this.load = load;
+  this.preload = load;  // Alias for .load()
   this.open = open;
   this.links = links;
   this.head = head;
   this.merge = merge;
-  this.init = init;
+  this.report = error => console.log('Error:', error);
 
-  // This needs to be here so that any script loaded a posteriori is also added
-  pageLoad.then(() => {
-
-    this.cache.set(window.location.href, {
-      href: window.location.href,
-      html: document.querySelector('html').outerHTML
-    });
-
-    this.init();
-  });
+  // Initialize the calls in the current window
+  this.init();
 };
 
 export default (new Premonition());
