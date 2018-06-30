@@ -2,11 +2,13 @@ import $ from './fquery';
 import inject from './inject';
 
 // Set the new content to whatever it is passed
-export default function (href, html) {
+export default function (href, html, { history = true } = {}) {
   // URL & History
   // This has to be before the DOM manipulations, otherwise the browser might
   //   think that the data is the old one
-  history.pushState({ href }, "", href);
+  if (history) {
+    window.history.pushState({ href }, "", href);
+  }
 
   // Generate a "virtual dom" (no, not your React virtual dom)
   const dom = document.createElement("html");

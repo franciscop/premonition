@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>{{title}}</title>
+  <title>premonition.js</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism-okaidia.min.css">
   <link rel="stylesheet" href="/web/style.min.css">
 </head>
 <body>
@@ -17,14 +18,12 @@
   </nav>
 
   <article>
-    <a href="/demo/">All Articles</a>
     {{{body}}}
-    {{> readnext}}
   </article>
-  Hello
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-javascript.min.js"></script>
   <script src="/index.min.js" data-pre-once></script>
-  <script type="text/javascript">
-    console.log('NO PARSING NEEDED');
-  </script>
 </body>
 </html>

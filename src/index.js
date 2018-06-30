@@ -33,8 +33,6 @@ const Premonition = function ({ attrs } = {}) {
 
   this.cache.onchange = event => this.links();
 
-  window.onpopstate = e => load(e.currentTarget.location.href);
-
   this.init = init;
   this.load = load;
   this.preload = load;  // Alias for .load()
@@ -43,6 +41,10 @@ const Premonition = function ({ attrs } = {}) {
   this.head = head;
   this.replace = replace;
   this.report = error => console.log('Error:', error);
+
+  window.onpopstate = e => {
+    this.open(e.currentTarget.location.href, { history: false });
+  };
 
   // Initialize the calls in the current window
   this.init();

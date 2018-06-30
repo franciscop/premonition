@@ -1,3 +1,7 @@
+---
+layout: home.hbs
+---
+
 # Preload App
 
 > **Early experiment**: only basic automatic parsing and the API specified are available now.
@@ -5,7 +9,7 @@
 Convert your website to a Progressive Web App with a single link. Or just make it faster, it's up to you. Include the script in your website to see it work:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/premonition"></script>
+<script src="https://cdn.jsdelivr.net/npm/premonition" data-pre-once></script>
 ```
 
 There are several modes, useful depending on your type of website and desired performance boost:

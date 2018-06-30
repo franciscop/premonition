@@ -4,15 +4,80 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>premonition.js</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism-okaidia.min.css">
+  <link rel="stylesheet" href="/web/style.min.css">
 </head>
 <body>
+  <nav>
+    <a class="brand" href="/">premonition.js</a>
+    <div class="menu">
+      <a href="/demo">Demo</a>
+      <a href="">World</a>
+    </div>
+  </nav>
 
-  <h1>Hello World</h1>
+  <article>
+    <h1 id="preload-app">Preload App</h1>
+<blockquote>
+<p><strong>Early experiment</strong>: only basic automatic parsing and the API specified are available now.</p>
+</blockquote>
+<p>Convert your website to a Progressive Web App with a single link. Or just make it faster, it&#39;s up to you. Include the script in your website to see it work:</p>
+<pre><code class="language-html">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/premonition&quot; data-pre-once&gt;&lt;/script&gt;</code></pre>
+<p>There are several modes, useful depending on your type of website and desired performance boost:</p>
+<ul>
+<li>PWA (Progressive Web App): will load and cache all the internal pages linked from the current page for 24h. Needs a <code>manifest.json</code> to actually become a PWA.</li>
+<li>Preload: will fetch the link when hovering a link for significantly faster loading. Cache the pages for 1h.</li>
+<li>SPA6: load the new page in-body without triggering a full reload. Make the page seem slightly faster. Cache the pages for 1 minute.</li>
+<li>Off: will not try to load or cache anything. You can now call the different methods to hook up.</li>
+</ul>
+<p>To trigger a mode, just write the attribute <code>data-mode</code> inside the <code>&lt;body&gt;</code>:</p>
+<pre><code class="language-html">&lt;body data-mode=&quot;pwa&quot;&gt;...&lt;/body&gt;
+&lt;body data-mode=&quot;preload&quot;&gt;...&lt;/body&gt;
+&lt;body data-mode=&quot;spa&quot;&gt;...&lt;/body&gt;
+&lt;body data-mode=&quot;off&quot;&gt;...&lt;/body&gt;</code></pre>
+<p><strong>Default</strong>: there is no default! In normal web usage it will use <code>preload</code>, but if it detects it&#39;s installed in a device as a PWA it will trigger <code>pwa</code>. If you want tight control specify the mode manually as shown above.</p>
+<p>Note: the cache is only in-memory; any page reload or the PWA getting closed will clear it.</p>
+<h2 id="api">API</h2>
+<pre><code class="language-js">// Automatically launch the full parser. Useful if you modify links dynamically
+pre.init();
 
-  <script src="index.min.js"></script>
-  <script>
-    console.log(pre);
-  </script>
+// Open one of the urls. Fallback if it&#39;s an external path
+pre.open(URL);
+
+// [pre]load a link into memory so a click later will be very fast cached
+pre.load(URL);
+
+// Replace the current, full html by a new url+html content
+pre.replace(&#39;/hello&#39;, &#39;&lt;html&gt;...&lt;/html&gt;&#39;);
+
+// Cache instance. Using tiny-lru: https://www.npmjs.com/package/tiny-lru
+pre.cache = lru(100, false, 0, 100000);
+pre.cache.get(HREF);
+// cache.set is mostly internal; highly prefer pre.load(HREF)
+pre.cache.set(HREF, { href: HREF, html: HTML });
+pre.cache.expire = 1000;  // Maximum time of the page
+pre.cache.clear();        // Remove all items from cache (login/logout)
+
+// All events happen just BEFORE the actual name, so they can be prevented
+// NOTE: not available yet
+pre.on(&#39;ready&#39;, e =&gt; {});         // The DOM is ready to be used
+pre.on(&#39;init&#39;, e =&gt; {});          // The script initialization is called
+pre.on(&#39;load&#39;, e =&gt; {});          // A single URL is attempted to be preloaded
+pre.on(&#39;preload&#39;, e =&gt; {});       // Alias for &#39;load&#39;
+pre.on(&#39;open&#39;, e =&gt; {});          // An HREF is going to be open (load+replace?)
+pre.on(&#39;replace&#39;, e =&gt; {});       // The website content is going to be updated
+pre.on(&#39;fetch&#39;, e =&gt; {});         // A HREF is going to be fetched
+pre.on(&#39;error&#39;, e =&gt; {});         // There is an error somewhere
+pre.on(&#39;cache.get&#39;, e =&gt; {});     // When a link is read from cache
+pre.on(&#39;cache.set&#39;, e =&gt; {});     // Update the cache with more HREF+HTML
+pre.on(&#39;cache.remove&#39;, e =&gt; {});  // Some HTML is removed from the cache</code></pre>
+
+  </article>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-javascript.min.js"></script>
+  <script src="/index.min.js" data-pre-once></script>
 </body>
 </html>

@@ -1,0 +1,51 @@
+@import '../node_modules/picnic/src/picnic';
+
+$spacing: 50px;
+$width: 900px;
+
+body {
+  background: #f12711;
+  background: linear-gradient(135deg, #f12711aa, #f5af19aa);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+nav {
+  padding: 0 calc(50% - #{$width / 2});
+
+  .brand, .menu {
+    padding: $spacing / 2;
+  }
+}
+
+main,
+article {
+  background: #fff;
+  padding: $spacing;
+  max-width: 900px;
+  margin: 120px auto;
+
+  h1 {
+    margin: 0;
+    padding: 0;
+  }
+
+
+  a {
+    display: block;
+  }
+
+  [data-pre-cached]::after {
+    content: 'cached!';
+    position: absolute;
+    font-size: 0.6em;
+    margin-left: 5px;
+    margin-top: 3px;
+    background: #ddd;
+    border-radius: 3px;
+    padding: 2px 5px;
+    vertical-align: middle;
+    background: red;
+    color: #fff;
+  }
+}
