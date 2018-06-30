@@ -7,7 +7,7 @@ import load from './load';
 import open from './open';
 import links from './links';
 import head from './head';
-import merge from './merge';
+import replace from './replace';
 
 const Premonition = function ({ attrs } = {}) {
 
@@ -41,7 +41,7 @@ const Premonition = function ({ attrs } = {}) {
   this.open = open;
   this.links = links;
   this.head = head;
-  this.merge = merge;
+  this.replace = replace;
   this.report = error => console.log('Error:', error);
 
   // Initialize the calls in the current window

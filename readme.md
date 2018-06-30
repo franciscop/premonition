@@ -1,9 +1,11 @@
 # Preload App
 
+> **Early experiment**: only basic automatic parsing and the API specified are available now.
+
 Convert your website to a Progressive Web App with a single link. Or just make it faster, it's up to you. Include the script in your website to see it work:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/[NAME]"></script>
+<script src="https://cdn.jsdelivr.net/npm/premonition"></script>
 ```
 
 There are several modes, useful depending on your type of website and desired performance boost:
@@ -22,41 +24,46 @@ To trigger a mode, just write the attribute `data-mode` inside the `<body>`:
 <body data-mode="off">...</body>
 ```
 
-**Default**: there is no default! In normal web usage it will use `preload`, but if it detects it's installed in a device as a PWA it will trigger `pwa`. If you want consistency, specify the mode manually as shown above.
+**Default**: there is no default! In normal web usage it will use `preload`, but if it detects it's installed in a device as a PWA it will trigger `pwa`. If you want tight control specify the mode manually as shown above.
 
-Note: the cache is only in-memory; any hard page reload or the PWA going into sleep will clear the cache.
+Note: the cache is only in-memory; any page reload or the PWA getting closed will clear it.
 
 
 
 ## API
 
 ```js
-// Open one of the urls. Fallback if it's an external path (use only relative!)
-link.open(URL);
+// Automatically launch the full parser. Useful if you modify links dynamically
+pre.init();
 
-// [pre]load a link into memory so a click later on will already be cached
-link.load(URL);
+// Open one of the urls. Fallback if it's an external path
+pre.open(URL);
 
-// Show a loading bar 300ms. Pass a number for the timing, or a promise to hide the bar on resolution/error. Feel free to pass `link.open(URL)` for the best performance:
-link.bar(NUMBER|PROMISE|UNDEFINED);
+// [pre]load a link into memory so a click later will be very fast cached
+pre.load(URL);
 
-// To never show the bar, set bar() to an empty function:
-link.bar = () => {};
+// Replace the current, full html by a new url+html content
+pre.replace('/hello', '<html>...</html>');
 
 // Cache instance. Using tiny-lru: https://www.npmjs.com/package/tiny-lru
-link.cache = lru(100, false, 100000, 100000);
-link.cache.get(HREF);
-link.cache.set(HREF, { href: HREF, html: HTML });
-link.cache.expire = 1000;  // Maximum time of the page
-link.cache.clear();        // Remove all items from cache
+pre.cache = lru(100, false, 0, 100000);
+pre.cache.get(HREF);
+// cache.set is mostly internal; highly prefer pre.load(HREF)
+pre.cache.set(HREF, { href: HREF, html: HTML });
+pre.cache.expire = 1000;  // Maximum time of the page
+pre.cache.clear();        // Remove all items from cache (login/logout)
 
 // All events happen just BEFORE the actual name, so they can be prevented
-link.on('load', e => {});
-link.on('open', e => {});
-link.on('success', e => {});
-link.on('error', e => {});
-link.on('bar', e => {});
-link.on('cache.get', e => {});
-link.on('cache.set', e => {});
-link.on('cache.remove', e => {});
+// NOTE: not available yet
+pre.on('ready', e => {});         // The DOM is ready to be used
+pre.on('init', e => {});          // The script initialization is called
+pre.on('load', e => {});          // A single URL is attempted to be preloaded
+pre.on('preload', e => {});       // Alias for 'load'
+pre.on('open', e => {});          // An HREF is going to be open (load+replace?)
+pre.on('replace', e => {});       // The website content is going to be updated
+pre.on('fetch', e => {});         // A HREF is going to be fetched
+pre.on('error', e => {});         // There is an error somewhere
+pre.on('cache.get', e => {});     // When a link is read from cache
+pre.on('cache.set', e => {});     // Update the cache with more HREF+HTML
+pre.on('cache.remove', e => {});  // Some HTML is removed from the cache
 ```

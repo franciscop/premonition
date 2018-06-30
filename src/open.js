@@ -10,7 +10,7 @@ export default async function (ref) {
     const data = await this.load(href);
 
     // Merge the data from the new site with the current one
-    await this.merge(data);
+    await this.replace(data.href, data.html);
 
     return this.init();
   } catch (error) {
