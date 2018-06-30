@@ -13,7 +13,7 @@ Make your website load *very* fast. Converts your website to a Single Page Appli
 <script src="https://cdn.jsdelivr.net/npm/premonition" data-pre-once></script>
 ```
 
-That's it, your website should be *very* fast now. You can use the [Javascript API](#api) or configure it [with the options](#options). See [the troubleshooting guide](#troubleshooting) if you have any issue.
+That's it, your website should be noticeably faster now. You can use the [Javascript API](#api) or configure it [with the options](#options). See [the troubleshooting guide](#troubleshooting) if you have any issue.
 
 > **Experiment tip**: open [the CDN link](https://cdn.jsdelivr.net/npm/premonition), copy the JS and paste it into your website console for testing this project in a real env in ~10s. If there's any error you'll have to do this again.
 
