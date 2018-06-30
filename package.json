@@ -1,6 +1,6 @@
 {
   "name": "premonition",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Convert your website to a Progressive Web App with a single link. Or just make it faster, it's up to you. Include the script in your website to see it work:",
   "main": "index.min.js",
   "scripts": {
