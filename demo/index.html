@@ -3,94 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>premonition.js demo</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism-okaidia.min.css">
-  <link rel="stylesheet" href="/web/style.min.css">
+  <title>premonition demo</title>
+  <link rel="stylesheet" href="/demo/style.css">
 </head>
 <body>
   <nav>
-    <a class="brand" href="/">premonition.js</a>
-    <div class="menu">
-      <a href="/demo">Demo</a>
-      <a href="https://github.com/franciscop/premonition">Github</a>
-    </div>
+    <a class="brand" href="/demo/">premonition demo</a>
+    <a href="https://github.com/franciscop/premonition">Github</a>
   </nav>
-
   <main>
     <h1>Premonition demo</h1>
-    <p>Click around the different links. We are rendering a "cached!" tag when an element is cached, and removing it when the cache has expired.</p>
-    <div class="flex two">
-          <div>
-            <a href="/demo/entry-a/">
-              <h2 id="entry-a">Entry A</h2>
-              <time datetime="2018-06-19 20:00">2018-06-19 20:00</time>
-            </a>
-          </div>
-          <div>
-            <a href="/demo/entry-b/">
-              <h2 id="entry-b">Entry B</h2>
-              <time datetime="2018-06-19 20:00">2018-06-19 20:00</time>
-            </a>
-          </div>
-          <div>
-            <a href="/demo/entry-c/">
-              <h2 id="entry-c">Entry C</h2>
-              <time datetime="2018-06-19 20:00">2018-06-19 20:00</time>
-            </a>
-          </div>
-          <div>
-            <a href="/demo/entry-d/">
-              <h2 id="entry-d">Entry D</h2>
-              <time datetime="2018-06-19 20:00">2018-06-19 20:00</time>
-            </a>
-          </div>
-          <div>
-            <a href="/demo/entry-e/">
-              <h2 id="entry-e">Entry E</h2>
-              <time datetime="2018-06-19 20:00">2018-06-19 20:00</time>
-            </a>
-          </div>
-          <div>
-            <a href="/demo/entry-f/">
-              <h2 id="entry-f">Entry F</h2>
-              <time datetime="2018-06-19 20:00">2018-06-19 20:00</time>
-            </a>
-          </div>
-    </div>
-    <div>
-      <h3>Same-page links</h3>
-        <div>
-          <a href="#entry-a">Entry A</a>
-        </div>
-        <div>
-          <a href="#entry-b">Entry B</a>
-        </div>
-        <div>
-          <a href="#entry-c">Entry C</a>
-        </div>
-        <div>
-          <a href="#entry-d">Entry D</a>
-        </div>
-        <div>
-          <a href="#entry-e">Entry E</a>
-        </div>
-        <div>
-          <a href="#entry-f">Entry F</a>
-        </div>
-        <div>
-          <a href="#premonition">premonition.js</a>
-        </div>
-    </div>
-  </main>
+    <p>Every page here is served with a 400ms delay, so the difference between a
+      cold click and a preloaded one is visible. Hover a link, wait a moment, and the
+      <em>cached</em> badge appears; click it and the page swaps with no reload.</p>
+    <p class="hint counters" data-counter></p>
 
-  <script src="https://unpkg.com/moment@2.22.2/min/moment.min.js" data-pre-once></script>
-  <script src="/index.min.js" data-once></script>
-  <script type="text/javascript">
-    console.log('PARSING DATES');
-    document.querySelectorAll('[datetime]').forEach(el => {
-      el.innerHTML = moment(el.getAttribute('datetime')).fromNow();
-    });
-  </script>
+    <h2>Entries</h2>
+    <p class="hint">Preloaded on hover, opened in place on click. The cache holds them for 10 seconds.</p>
+    <ul>
+      <li><a href="/demo/entry-a/">Entry A</a></li>
+      <li><a href="/demo/entry-b/">Entry B</a></li>
+      <li><a href="/demo/entry-c/">Entry C</a></li>
+      <li><a href="/demo/entry-d/">Entry D</a></li>
+      <li><a href="/demo/entry-e/">Entry E</a></li>
+      <li><a href="/demo/entry-f/">Entry F</a></li>
+    </ul>
+
+    <h2>Fragments</h2>
+    <ul>
+      <li><a href="/demo/entry-a/#end">Entry A, straight to the bottom</a> (scrolls to the anchor after the swap)</li>
+      <li><a href="#entries-again">A link to this same page</a> (the browser handles it, no fetch)</li>
+    </ul>
+
+    <h2>Links premonition leaves alone</h2>
+    <ul>
+      <li><a href="/demo/entry-b/" data-pre-ignore>Entry B with data-pre-ignore</a> (full page load, so ignored.js logs)</li>
+      <li><a href="/demo/entry-c/" target="_blank">Entry C in a new tab</a></li>
+      <li><a href="https://francisco.io/">An external site</a></li>
+      <li><a href="mailto:public@francisco.io">An email address</a></li>
+      <li><a href="/demo/style.css" download>A download</a></li>
+    </ul>
+
+    <h2>What to watch in the console</h2>
+    <ul>
+      <li><code>once.js</code> runs once for the whole session, it has <code>data-pre-once</code>.</li>
+      <li><code>every.js</code> runs again on every page, it writes the two counters above.</li>
+      <li><code>ignored.js</code> has <code>data-pre-ignore</code>, so it only logs on a real page load.</li>
+    </ul>
+
+    <h2 id="entries-again">Back where you started</h2>
+    <p><a href="/demo/">Reload the index through premonition</a></p>
+  </main>
+  <script src="/index.min.js" data-pre-once></script>
+  <script src="/demo/once.js" data-pre-once></script>
+  <script src="/demo/every.js"></script>
+  <script src="/demo/ignored.js" data-pre-ignore></script>
 </body>
 </html>

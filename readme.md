@@ -1,194 +1,156 @@
----
-title: premonition.js
-layout: home.hbs
----
+# premonition [![npm install premonition](https://img.shields.io/badge/npm%20install-premonition-blue.svg)](https://www.npmjs.com/package/premonition) [![test badge](https://github.com/franciscop/premonition/workflows/tests/badge.svg "test badge")](https://github.com/franciscop/premonition/actions) [![gzip size](https://img.badgesize.io/franciscop/premonition/master/index.min.js.svg?label=gzip&logo=&compression=gzip)](https://github.com/franciscop/premonition/blob/master/index.min.js) [![dependencies](https://img.shields.io/badge/dependencies-0-limegreen.svg)](https://github.com/franciscop/premonition/blob/master/package.json)
 
-# Preload App
+Make your website load instantly: links are fetched when the user hovers them, and opening one swaps the page in place instead of doing a full reload.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/premonition"></script>
+```
+
+That is the whole setup. Every same-site link on the page is now preloaded on hover and opened without a page reload.
 
 > **Early experiment**, use at your own [high] risk.
 
-Make your website load *very* fast. Converts your website to a Single Page Application. Or just make it faster, it's up to you. Include the script in your website to see it work:
+## Getting started
+
+Load it from a CDN, which needs no build step and no configuration:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/premonition" data-pre-once></script>
+<script src="https://cdn.jsdelivr.net/npm/premonition"></script>
 ```
 
-That's it, your website should be noticeably faster now. You can use the [Javascript API](#api) or configure it [with the options](#options). See [the troubleshooting guide](#troubleshooting) if you have any issue.
+Or install it and import it, which does the same setup and defines the same `pre` global:
 
-> **Experiment tip**: open [the CDN link](https://cdn.jsdelivr.net/npm/premonition), copy the JS and paste it into your website console for testing this project in a real env in ~10s. If there's any error you'll have to do this again.
-
-
-
-## API
-
-You now have this API available:
+```bash
+npm install premonition
+```
 
 ```js
-// Parse the full current website from scratch
-pre.init(OPTS);   // Note: it is called onload
-
-// Open the passed urls or link element
-pre.open(URL);
-
-// [pre]load a link into memory for later opening
-pre.load(URL);
-
-// Replace the current page by a new url+html
-pre.replace('/hello', '<html>...</html>');
-
-// Cache instance. Using tiny-lru: https://www.npmjs.com/package/tiny-lru
-pre.cache = lru(100, false, 0, 100000);
-pre.cache.get(HREF);
-// cache.set is mostly internal; highly prefer pre.load(HREF)
-pre.cache.set(HREF, { href: HREF, html: HTML });
-pre.cache.expire = 1000;  // Maximum time of the page
-pre.cache.clear();        // Remove all items from cache (login/logout)
-
-// All events happen just BEFORE the actual name, so they can be prevented
-// NOTE: not available yet
-pre.on('ready', e => {});         // The DOM is ready to be used
-pre.on('init', e => {});          // The script initialization is called
-pre.on('load', e => {});          // A single URL is attempted to be preloaded
-pre.on('preload', e => {});       // Alias for 'load'
-pre.on('open', e => {});          // An HREF is going to be open (load+replace)
-pre.on('replace', e => {});       // The website content is going to be updated
-pre.on('fetch', e => {});         // A HREF is going to be fetched
-pre.on('error', e => {});         // There is an error somewhere
-pre.on('cache.get', e => {});     // When a link is read from cache
-pre.on('cache.set', e => {});     // Update the cache with more HREF+HTML
-pre.on('cache.remove', e => {});  // Some HTML is removed from the cache
+import 'premonition';
 ```
 
+Either way there is nothing to call: premonition hooks up the page as soon as it loads.
 
+## Usage
 
-## Options
+Premonition attaches itself to every `<a>` on the page that points to the same site, and then:
 
-There are global options and per-element options:
+1. On `mouseover` or `touchstart`, it fetches the target page and keeps the HTML in memory.
+2. On `click`, it swaps the current `<body>` and `<head>` for the new ones and pushes the URL to the history, so the back button keeps working.
 
-- Global options can be specified on the `<body>` element or when calling `pre.init({ OPTIONS })`.
-- Element options should be specified in the element (e.g., `<script>`) or when calling the specific method.
+It leaves these link types alone, because swapping the body would break things: other hosts, `target="_blank"`, `download`, schemes like `mailto:` or `tel:`, bare `#fragment` links, and anything marked with `data-pre-ignore`.
 
-When using HTML elements, they are always prefixed by `data-pre-NAME=""` (except `data-pre=""`, which is the mode).
+The cache holds the 100 most recent pages for 10 seconds each, in memory only: a real page reload clears it.
 
-Examples:
-
-```html
-<body data-pre="pwa">
-<body data-pre="pwa" data-pre-expire="100s">
-<body data-pre="pwa" data-pre-expire="100s" data-pre-elements="100">
-<body data-pre="preload">
-```
-
-
-
-### `mode`
-
-There are several modes that you can tweak within the `<body>` tag:
-
-```html
-<body data-pre="pwa">...</body>
-<body data-pre="preload">...</body>
-<body data-pre="spa">...</body>
-<body data-pre="off">...</body>
-```
-
-These are useful depending on your type of website and desired performance boost:
-
-- `pwa` (Progressive Web App): the most aggressive one, will load and cache all the internal pages linked from the current page for 24h. Note: still needs a `manifest.json` to actually become a PWA.
-- `preload`: will fetch the link when hovering a link for significantly faster loading. Cache the pages for 100 seconds.
-- `spa` (Single Page Application): will fetch the page onmousedown and load the new page in-body. Make the page seem slightly faster. Cache the pages for 10 seconds.
-- `off`: will not try to load or cache anything. You can now call the different methods to hook up specific link in specific situations.
-
-**Default mode**: In normal web usage it will use `preload`, but if it detects it's installed in a device as a PWA it will trigger the `pwa` mode. If you want tight control specify the mode manually as shown above.
-
-> The cache is only in-memory; any page reload or the PWA getting closed will clear it.
-
-#### Picking a mode
-
-The mode will determine how aggressively the preload and cache is used and your users data consumption. Until you get used to the details, just don't pick a mode and let premonition.js choose for you.
-
-Premonition *only* loads the html and scripts (see [skipping scripts](#load-once)). These normally are quite light and ~10-20 average HTML pages are the equivalent of a single image. So, if your site is fairly small, `pwa` is the recommended way to go.
-
-If you are in the middle-ground, then `preload` is nice in that it will boost greatly page load speed while only preloading selectively those links that are hovered.
-
-If you want a very light experience without any wasted requests for the user but still slightly faster loads, then use the `spa` mode. It has slightly better performance in mobile (300ms).
-
-Finally, turn it off if you want to manually and selectively load links in some situations. Use this to load links only when they become visible on scrolling for example.
-
-
+Three attributes change what premonition does with a given element, and they are how you fix a script or a link that misbehaves across page swaps.
 
 ### `once`
 
-Evaluate a `<script>` only once ever even if it's in the new page:
+Evaluate a `<script>` only once, even when it is also in the new page:
 
 ```html
 <script src="..." data-pre-once></script>
 ```
 
-If the script src target does not exist in the old page but exists in the new page, it will be run. If it already exists in the old page, it will be skipped.
+If the script `src` is not in the old page but is in the new one, it runs. If it already ran, it is skipped.
 
-**Add this option** for these kind of libraries since they *only define a global API* so we only want them to run once:
+**Add this option** to libraries that only define a global API, since they should only run once:
+
 - jQuery.js
 - moment.js
 - etc.
 
-**Do not add** to scripts that run some code against the current HTML since those will very likely need to run it with the new HTML:
-- Inline scripts (will be ignored). To avoid re-rendering inline scripts, see [the option ignore](#ignore).
-- prism.js: this will automatically highlight the page code snippets, so it needs to be run on every pageload.
+**Do not add it** to scripts that run against the current HTML, since those need to run again with the new HTML:
+
+- prism.js: it highlights the code snippets on the page, so it needs to run on every page load.
 - etc.
-
-Compare the options for loading a script from the new page:
-
-- `<script src="..."></script>`: run the full script after the HTML has loaded.
-- `<script src="..." data-pre-once></script>`: run the script only if the `src` is not in the previous page(s).
-- `<script src="..." data-pre-ignore></script>`: completely ignore the script. Will not be run at all in any case.
-
-
 
 ### `ignore`
 
-Premonition will completely ignore a script, link, etc. with this option:
+Premonition will completely ignore the element:
 
 ```html
-<a href="/logout" data-pre-ignore></script>
+<a href="/logout" data-pre-ignore>Log out</a>
 <script src="..." data-pre-ignore></script>
 ```
 
-This is useful for some links that you do not want preloaded or scripts that you do not want re-evaluated. Examples:
+Useful for links you do not want preloaded, and for scripts you do not want re-evaluated. Inline scripts that must only run on a real page load are the common case: we cannot stop them on a full refresh, but we can avoid re-running them here.
 
-- Inline scripts that must be run only onload. We cannot prevent those from running on a full page refresh, but we can avoid re-running those.
-- Links that are making a request that changes some state. We would recommend in this situation to follow the `HTTP` specification, so links only do GET requests which have no side effects. Leave side effects for `<form>`.
+For links that change state, we would recommend following the HTTP specification instead, so that links only make GET requests with no side effects, and side effects live in a `<form>`.
 
-Compare the options for loading a script from the new page:
+Comparing the three ways a script from the new page can be treated:
 
-- `<script src="..."></script>`: run the full script after the HTML has loaded.
-- `<script src="..." data-pre-once></script>`: run the script only if the `src` is not in the previous page(s).
-- `<script src="..." data-pre-ignore></script>`: completely ignore the script. Will not be run at all in any case.
+- `<script src="..."></script>`: run it after the new HTML is in place.
+- `<script src="..." data-pre-once></script>`: run it only if the `src` did not run before.
+- `<script src="..." data-pre-ignore></script>`: never run it.
 
+### `cached`
 
+Premonition sets `data-pre-cached` on the links whose page is currently in the cache, and removes it when it is not. It is written by the library, not by you, and it is there so you can style preloaded links:
 
-## Troubleshooting
+```css
+a[data-pre-cached] { border-bottom: 1px solid green; }
+```
 
-**Very early experiment**, [please open an issue](https://github.com/franciscop/premonition) if you need any help.
+## Javascript API
 
+> **You do not need any of this.** The script tag sets everything up on its own.
+> The calls below are for the few things it cannot do for you: clearing the cache when
+> someone logs in or out, hooking up links that your own Javascript added after the
+> page loaded, and sending errors somewhere other than the console.
 
+Loading it as a `<script>` exposes the instance as the `pre` global:
 
-## FAQ, credit and alternatives
+```js
+// Parse the current page and hook up its links. Called automatically onload
+pre.init(SELECTOR); // default: 'a'
 
-### What about [Instant Click](http://instantclick.io/)?
+// Open a url or <a> element, loading it first if it is not cached yet
+pre.open(URL);
 
-I love it! It was the main inspiration for Premonition.js. However, it is ridden with bugs and [development seems to be stopped](https://github.com/dieulot/instantclick/) with [pull requests languishing](https://github.com/dieulot/instantclick/pulls). These bugs/lack of features were show-stoppers for me:
+// Preload a url or <a> element into memory for a later .open()
+pre.load(URL);
+pre.preload(URL); // Alias for .load()
 
-- No cache. This means that if you move your mouse around, the links will be fetched again and again.
-- Important [race conditions](https://github.com/dieulot/instantclick/pull/85): you never know which script will finish first, which will definitely lead to bugs. I fixed this by loading the scripts sequentially.
-- Plug-n-play: I would like to just drop the script into some of my projects, so I worked very hard to make this work by default. Instantclick seems to be more oriented to using the API.
+// Replace the current page with a new url + html
+pre.replace('/hello', '<html>...</html>');
 
+// Update the data-pre-cached attributes. Called automatically on cache changes
+pre.links(SELECTOR); // default: 'a'
+
+// Called with any error that happens along the way; overwrite it to report them
+pre.report = error => console.log('Error:', error);
+```
+
+The cache is a small LRU store that you can read and clear directly:
+
+```js
+pre.cache.get(HREF);      // Returns { href, html } or undefined
+pre.cache.set(HREF, { href: HREF, html: HTML });  // Prefer pre.load(HREF)
+pre.cache.keys();         // The hrefs currently cached
+pre.cache.clear();        // Remove all items from cache (login/logout)
+pre.cache.max = 100;      // Maximum number of pages kept
+pre.cache.ttl = 10000;    // Milliseconds before a page is considered stale
+```
+
+## Demo
+
+There is a small site under `demo/` to try it by hand. Its pages are served with an
+artificial delay, so the difference between a cold click and a preloaded one is easy to see:
+
+```bash
+npm run build && npm run demo   # http://localhost:3200/demo/
+```
+
+## FAQ
+
+### What about [InstantClick](http://instantclick.io/)?
+
+I love it, it was the main inspiration for Premonition. However it is ridden with bugs and [development seems to be stopped](https://github.com/dieulot/instantclick/), with [pull requests languishing](https://github.com/dieulot/instantclick/pulls). These were show-stoppers for me:
+
+- No cache: moving the mouse around fetches the same links again and again.
+- Important [race conditions](https://github.com/dieulot/instantclick/pull/85): you never know which script finishes first, which leads to bugs. Premonition loads the scripts sequentially.
+- Plug and play: I wanted to drop the script into a project and have it work by default, while InstantClick is more oriented towards using its API.
 
 ### What about [Turbolinks](https://github.com/turbolinks/turbolinks)?
 
-Another very awesome project. However, its scope seems to be a lot smaller. The similar feature with Premonition is `mode: spa`. Use Turbolinks if you want a very well tested and documented library, use Premonition if you want faster pages.
-
-
-### Why do you use [Tiny-LRU](https://github.com/avoidwork/tiny-lru)?
-
-Because it is awesome! The LRU algorithm ensures that only the most recent URLs are cached, improving the memory usage and reducing the cache misses.
+Another very nice project, with a smaller scope: it swaps pages on click, while Premonition also preloads them on hover.

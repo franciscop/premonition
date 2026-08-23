@@ -1,0 +1,27 @@
+:root { --line: #e2e2e6; --dim: #6b6b76; }
+* { box-sizing: border-box; }
+body {
+  max-width: 46rem; margin: 0 auto; padding: 2rem 1.5rem 6rem;
+  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #16161a;
+}
+nav { display: flex; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+nav .brand { font-weight: 600; margin-right: auto; }
+h1 { margin: 2rem 0 0.5rem; }
+h2 { margin-top: 2.5rem; }
+a { color: #1d4ed8; }
+p.hint { color: var(--dim); }
+ul { padding-left: 1.2rem; }
+li { margin: 0.4rem 0; }
+code { background: #f3f3f6; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9em; }
+
+/* Premonition adds this attribute to every link whose page is in the cache */
+a[data-pre-cached]::after {
+  content: "cached";
+  margin-left: 0.5rem; padding: 0.05rem 0.4rem;
+  background: #dcfce7; color: #166534;
+  border-radius: 3px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.03em;
+}
+
+.counters { border: 1px solid var(--line); border-radius: 6px; padding: 0.5rem 1rem; }
+.counters b { font-variant-numeric: tabular-nums; }
