@@ -1,6 +1,6 @@
 {
   "name": "premonition",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Make your website load instantly by preloading links and swapping pages in place",
   "repository": "github:franciscop/premonition",
   "author": "Francisco Presencia <public@francisco.io> (https://francisco.io/)",
