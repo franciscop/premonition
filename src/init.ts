@@ -27,7 +27,9 @@ export default async function (this: Premonition, links = "a"): Promise<void> {
 
     // Nothing is waiting on a preload, so its failure has to be caught here
     const preload = (e: Event) =>
-      this.load(e.currentTarget as HTMLAnchorElement).catch((error) => this.report(error));
+      this.load(e.currentTarget as HTMLAnchorElement).catch((error) =>
+        this.report(error),
+      );
     link.addEventListener("mouseover", preload);
     link.addEventListener("touchstart", preload);
     link.addEventListener("click", (e) => {

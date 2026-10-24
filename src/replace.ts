@@ -32,7 +32,10 @@ export default function (
   else window.scrollTo(0, 0);
 
   // Recursive iteration over the scripts when they have finished loading
-  const flipScript = ([current, ...scripts]: HTMLScriptElement[]): Promise<void> => {
+  const flipScript = ([
+    current,
+    ...scripts
+  ]: HTMLScriptElement[]): Promise<void> => {
     if (!current) return Promise.resolve();
     return inject(current, body, this.loaded).then(() => flipScript(scripts));
   };

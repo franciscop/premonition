@@ -64,7 +64,9 @@ describe("validate", () => {
   });
 
   it("reads the href of an anchor", () => {
-    expect(validate(anchor('<a href="/about">a</a>'))).toBe(`${location.origin}/about`);
+    expect(validate(anchor('<a href="/about">a</a>'))).toBe(
+      `${location.origin}/about`,
+    );
   });
 
   it("throws without an argument", () => {
@@ -76,7 +78,9 @@ describe("validate", () => {
   });
 
   it("throws for another element", () => {
-    expect(() => validate(document.createElement("div"))).toThrow('received "DIV"');
+    expect(() => validate(document.createElement("div"))).toThrow(
+      'received "DIV"',
+    );
   });
 
   it("prefixes the error with the caller", () => {
@@ -132,11 +136,15 @@ describe("head", () => {
   };
 
   it("keeps an identical head untouched", () => {
-    expect(patch("<title>A</title>", "<title>A</title>")).toBe("<title>A</title>");
+    expect(patch("<title>A</title>", "<title>A</title>")).toBe(
+      "<title>A</title>",
+    );
   });
 
   it("updates an element", () => {
-    expect(patch("<title>A</title>", "<title>B</title>")).toBe("<title>B</title>");
+    expect(patch("<title>A</title>", "<title>B</title>")).toBe(
+      "<title>B</title>",
+    );
   });
 
   it("adds the new elements", () => {
@@ -150,7 +158,9 @@ describe("head", () => {
   });
 
   it("leaves no leftover marker attributes", () => {
-    expect(patch("<title>A</title>", "<title>B</title>")).not.toContain(attrs.keep);
+    expect(patch("<title>A</title>", "<title>B</title>")).not.toContain(
+      attrs.keep,
+    );
   });
 });
 
@@ -224,7 +234,9 @@ describe("load", () => {
     let fail = true;
     globalThis.fetch = ((u: string) => {
       calls.push(u);
-      return fail ? Promise.reject(new Error("offline")) : Promise.resolve(new Response("later"));
+      return fail
+        ? Promise.reject(new Error("offline"))
+        : Promise.resolve(new Response("later"));
     }) as unknown as typeof fetch;
 
     expect(pre.load("/flaky")).rejects.toThrow("offline");
@@ -238,7 +250,9 @@ describe("load", () => {
 
   it("reports a failed response", async () => {
     globalThis.fetch = (() =>
-      Promise.resolve(new Response("", { status: 404, statusText: "Not Found" }))) as unknown as typeof fetch;
+      Promise.resolve(
+        new Response("", { status: 404, statusText: "Not Found" }),
+      )) as unknown as typeof fetch;
     const report = mock(() => {});
     pre.report = report;
     await pre.load("/missing");
@@ -270,7 +284,8 @@ describe("init", () => {
     await pre.init();
 
     // What .replace() does to the document between one .init() and the next
-    document.body.innerHTML = "<p>as the server sent it</p><script></" + "script>";
+    document.body.innerHTML =
+      "<p>as the server sent it</p><script></" + "script>";
     await pre.init();
 
     expect(pre.cache.get(url("/twice"))?.html).not.toContain("script");
@@ -278,13 +293,16 @@ describe("init", () => {
 
   it("reports a preload failure instead of leaving it unhandled", async () => {
     document.body.innerHTML = `<a href="/hovered">a</a>`;
-    globalThis.fetch = (() => Promise.reject(new Error("offline"))) as unknown as typeof fetch;
+    globalThis.fetch = (() =>
+      Promise.reject(new Error("offline"))) as unknown as typeof fetch;
     const pre = new Premonition();
     const report = mock(() => {});
     pre.report = report;
     await pre.init();
 
-    document.querySelector("a")!.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+    document
+      .querySelector("a")!
+      .dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
     await Bun.sleep(5);
     expect(report).toHaveBeenCalled();
   });
@@ -334,12 +352,18 @@ describe("replace", () => {
   });
 
   it("re-injects the scripts of the new page", async () => {
-    await pre.replace("/new", page("<scr" + "ipt>window.ran = true;</scr" + "ipt>"));
+    await pre.replace(
+      "/new",
+      page("<scr" + "ipt>window.ran = true;</scr" + "ipt>"),
+    );
     expect(document.querySelectorAll("script").length).toBe(2);
   });
 
   it("skips the opted-out scripts", async () => {
-    await pre.replace("/new", page('<script src="/a.js" data-pre-ignore></script>'));
+    await pre.replace(
+      "/new",
+      page('<script src="/a.js" data-pre-ignore></script>'),
+    );
     expect(document.querySelectorAll('script[src="/a.js"]').length).toBe(1);
   });
 
@@ -358,7 +382,9 @@ describe("open", () => {
     pre = new Premonition();
     pre.cache.clear();
     globalThis.fetch = (() =>
-      Promise.resolve(new Response("<html><body><p>new</p></body></html>"))) as unknown as typeof fetch;
+      Promise.resolve(
+        new Response("<html><body><p>new</p></body></html>"),
+      )) as unknown as typeof fetch;
   });
 
   afterEach(() => {

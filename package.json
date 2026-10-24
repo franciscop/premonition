@@ -15,7 +15,8 @@
     "browser"
   ],
   "scripts": {
-    "build": "bun build src/browser.ts --outfile=index.min.js --format=iife --minify",
+    "build": "bun build src/browser.ts --outfile=index.min.js --format=iife --minify && npm run build:prettier",
+    "build:prettier": "prettier --write src *.json",
     "demo": "bun demo/server.ts",
     "lint": "oxlint src && tsc",
     "size": "echo $(gzip -c index.min.js | wc -c) bytes",
@@ -28,9 +29,10 @@
     "index.min.js"
   ],
   "devDependencies": {
-    "@happy-dom/global-registrator": "^20.9.0",
-    "@types/bun": "^1.3.0",
+    "@happy-dom/global-registrator": "^21.0.4",
+    "@types/bun": "^1.4.4",
     "oxlint": "^1.89.0",
-    "typescript": "5.9"
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2"
   }
 }

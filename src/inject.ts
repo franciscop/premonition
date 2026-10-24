@@ -21,7 +21,9 @@ export default (
     }
 
     // Wrap the inline code in a new context to avoid globals being re-assigned
-    script.appendChild(document.createTextNode(`(() => {${scr.textContent}})();`));
+    script.appendChild(
+      document.createTextNode(`(() => {${scr.textContent}})();`),
+    );
     body.appendChild(script);
     resolve();
   });

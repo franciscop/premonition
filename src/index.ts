@@ -7,7 +7,12 @@ import load from "./load";
 import open from "./open";
 import replace from "./replace";
 
-export type Attrs = { once: string; ignore: string; keep: string; cache: string };
+export type Attrs = {
+  once: string;
+  ignore: string;
+  keep: string;
+  cache: string;
+};
 export type Options = { attrs?: Partial<Attrs> };
 
 export class Premonition {

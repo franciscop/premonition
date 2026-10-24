@@ -7,10 +7,14 @@ export default (ref: unknown, pre = ""): string => {
   }
   const node = href as Node;
   if (node.nodeName === "A") {
-    throw new Error(`${pre} argument element is missing the href="" or it is empty`);
+    throw new Error(
+      `${pre} argument element is missing the href="" or it is empty`,
+    );
   }
   if (node.nodeName) {
-    throw new Error(`${pre} expected an anchor <a> element, received "${node.nodeName}"`);
+    throw new Error(
+      `${pre} expected an anchor <a> element, received "${node.nodeName}"`,
+    );
   }
   if (typeof href !== "string") {
     throw new Error(`${pre} expected a string, received ${typeof href}`);
